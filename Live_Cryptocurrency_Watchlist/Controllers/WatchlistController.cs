@@ -27,14 +27,15 @@ namespace Live_Cryptocurrency_Watchlist.Controllers
             if (newUser == null || string.IsNullOrEmpty(newUser.Username) || string.IsNullOrEmpty(newUser.Password))
                 return BadRequest("Username and Password are required.");
 
-            // Check if username is already taken
+            if (newUser.Password.Length < 8 || newUser.Password.Length > 16)
+                return BadRequest("Password must be between 8 and 16 characters long.");
+
             bool exists = _context.Users.Any(u => u.Username.ToLower() == newUser.Username.ToLower().Trim());
             if (exists) return BadRequest("Username is already taken. Please choose another.");
 
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
-            // Never send the password back to the frontend!
             return Ok(new { UserId = newUser.UserId, Username = newUser.Username });
         }
 
