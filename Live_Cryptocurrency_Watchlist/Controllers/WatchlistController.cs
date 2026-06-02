@@ -55,25 +55,9 @@ namespace Live_Cryptocurrency_Watchlist.Controllers
             return Ok(new { UserId = existingUser.UserId, Username = existingUser.Username });
         }
 
-        [HttpGet("users")]
-        public IActionResult GetUser()
-        {
-            var users = _context.Users.Include(u => u.SavedCoins).ToList();
-            return Ok(users);
-        }
+        //[HttpGet("users")]
 
-        [HttpPost("users")]
-        public IActionResult CreateUser([FromBody] User newUser)
-        {
-            if (newUser == null || string.IsNullOrEmpty(newUser.Username))
-            {
-                return BadRequest("Invalid user data.");
-            }
-
-            _context.Users.Add(newUser);
-            _context.SaveChanges();
-            return Ok(newUser);
-        }
+        //[HttpPost("users")]
 
         [HttpPost("coins")]
         public async Task<IActionResult> AddCoins([FromBody] SavedCoin newCoin)
@@ -85,9 +69,13 @@ namespace Live_Cryptocurrency_Watchlist.Controllers
 
             string safeCoinId = newCoin.CoinId.ToLower().Trim();
 
-            decimal priceCheck = await _cryptoPriceService.GetPriceAsync(safeCoinId);
-
             bool exist = _context.Users.Any(u => u.UserId == newCoin.UserId);
+            if (!exist)
+            {
+                return NotFound("User not found.");
+            }
+
+            decimal priceCheck = await _cryptoPriceService.GetPriceAsync(safeCoinId);
 
             if(priceCheck == 0m)
                 return BadRequest($"We couldn't find a coin named '{newCoin.CoinId}'. Please check your spelling.");
