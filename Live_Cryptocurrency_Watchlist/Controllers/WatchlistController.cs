@@ -55,9 +55,6 @@ namespace Live_Cryptocurrency_Watchlist.Controllers
             return Ok(new { UserId = existingUser.UserId, Username = existingUser.Username });
         }
 
-        //[HttpGet("users")]
-
-        //[HttpPost("users")]
 
         [HttpPost("coins")]
         public async Task<IActionResult> AddCoins([FromBody] SavedCoin newCoin)
@@ -79,11 +76,6 @@ namespace Live_Cryptocurrency_Watchlist.Controllers
 
             if(priceCheck == 0m)
                 return BadRequest($"We couldn't find a coin named '{newCoin.CoinId}'. Please check your spelling.");
-
-            if (!exist)
-            {
-                return NotFound("User not found.");
-            }
 
             var existingCoin = _context.SavedCoins.FirstOrDefault(c => c.UserId == newCoin.UserId && c.CoinId == safeCoinId);
 
